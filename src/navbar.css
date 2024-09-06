@@ -1,0 +1,16 @@
+/* Navbar.css */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: #282c34; /* Dark grey background */
+  color: #61dafb; /* React blue color */
+  padding: 10px;
+  z-index: 1000; /* Ensure the navbar is above other content */
+  text-align: center;
+}
+
+.navbar h1 {
+  margin: 0;
+}
