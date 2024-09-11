@@ -4,6 +4,7 @@ import BarChart from './BarChart';
 import { parseConsoleData } from './utils/parseConsoleData';
 import './App.css'; // Import CSS file for styling
 import Navbar from './Navbar'; // Import Navbar component
+import Chart from 'chart.js/auto';
 
 const App = () => {
   const [data, setData] = useState([]);
@@ -74,8 +75,40 @@ const App = () => {
       });
   }, []);
 
+  const [repoInfo, setRepoInfo] = useState(null);
+  const [repoLanguages, setRepoLanguages] = useState(null);
+  
+
+  // Fetch GitHub repository information and languages
+  useEffect(() => {
+    // Fetch repository languages
+    async function fetchRepoLanguages() {
+      const response = await fetch('http://localhost:3001/api/repo-languages');
+      const languages = await response.json();
+      setRepoLanguages(languages); // Save fetched languages data
+    }
+
+    // Fetch repository information
+    async function fetchRepoInfo() {
+      const response = await fetch('http://localhost:3001/api/repo');
+      const data = await response.json();
+      setRepoInfo(data); // Save fetched repository info
+    }
+
+    fetchRepoLanguages();
+    fetchRepoInfo();
+  }, []);
 
   if (loading) return <div>Loading...</div>;
+
+  // Preparing data for the languages bar chart
+  const languageData = repoLanguages
+    ? Object.entries(repoLanguages).map(([language, count]) => ({
+        command: language,
+        count: count, // Use the language byte size as count
+      }))
+    : [];
+
 
   return (
     <div className="app-container">
@@ -90,6 +123,19 @@ const App = () => {
         </div>
       ))}
       </div>
+
+      <h1>GitHub Repository Information</h1>
+      {repoInfo && (
+        <div>
+          <p><strong>Repo Name:</strong> {repoInfo.name}</p>
+          <p><strong>Description:</strong> {repoInfo.description}</p>
+          <p><strong>Created At:</strong> {new Date(repoInfo.created_at).toLocaleDateString()}</p>
+          <p><strong>Language:</strong> {repoInfo.language}</p>
+        </div>
+      )}
+
+      <h2>Languages Used</h2>
+      <canvas id="languageChart" width="400" height="400"></canvas>
     </div>
   );
 };
